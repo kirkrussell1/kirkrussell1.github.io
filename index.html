@@ -300,38 +300,39 @@
         }
 
         function checkConjugations() {
-            attempts++;
-            const userConjugations = [];
-            for (let i = 1; i <= 6; i++) {
-                userConjugations.push(document.getElementById('conjugation' + i).value.trim());
-            }
-            const correctConjugations = verbs[currentVerb][currentTense];
-            let score = 0;
-            let resultText = '';
+    attempts++;
+    const userConjugations = [];
+    for (let i = 1; i <= 6; i++) {
+        userConjugations.push(document.getElementById('conjugation' + i).value.trim().toLowerCase());
+    }
+    const correctConjugations = verbs[currentVerb][currentTense].map(conjugation => conjugation.toLowerCase());
+    let score = 0;
+    let resultText = '';
 
-            for (let i = 0; i < 6; i++) {
-                if (userConjugations[i] === correctConjugations[i]) {
-                    score++;
-                    document.getElementById('conjugation' + (i + 1)).classList.add('correct');
-                } else {
-                    document.getElementById('conjugation' + (i + 1)).classList.remove('correct');
-                }
-            }
-
-            if (score === 6) {
-                perfectScoreCounter++;
-                document.getElementById('perfectScoreCounter').innerText = perfectScoreCounter;
-            }
-
-            if (attempts >= 3) {
-                resultText = 'Correct conjugations:<br>';
-                for (let i = 0; i < 6; i++) {
-                    resultText += `(${i + 1}) ${correctConjugations[i]}<br>`;
-                }
-            }
-
-            document.getElementById('result').innerHTML = `Your score: ${score} out of 6<br>${resultText}`;
+    for (let i = 0; i < 6; i++) {
+        if (userConjugations[i] === correctConjugations[i]) {
+            score++;
+            document.getElementById('conjugation' + (i + 1)).classList.add('correct');
+        } else {
+            document.getElementById('conjugation' + (i + 1)).classList.remove('correct');
         }
+    }
+
+    if (score === 6) {
+        perfectScoreCounter++;
+        document.getElementById('perfectScoreCounter').innerText = perfectScoreCounter;
+    }
+
+    if (attempts >= 3) {
+        resultText = 'Correct conjugations:<br>';
+        for (let i = 0; i < 6; i++) {
+            resultText += `(${i + 1}) ${correctConjugations[i]}<br>`;
+        }
+    }
+
+    document.getElementById('result').innerHTML = `Your score: ${score} out of 6<br>${resultText}`;
+}
+
 
         window.onload = function () {
             nextVerb(); 
