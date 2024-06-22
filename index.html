@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Verb Conjugation Practice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007AFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        button.check {
+            margin-right: 10px;
+        }
+        button.next {
+            margin-left: 10px;
+        }
+        .correct {
+            background-color: #d4edda;
+        }
+    </style>    
+</head>
+<body>
+    <div class="container">
+        <h1>Conjugation Practice</h1>
+        <h2>Perfect Scores: <span id="perfectScoreCounter">0</span></h2>
+        <div class="form-group">
+            <label for="verb">Verb:</label>
+            <span id="verbDisplay"></span>
+        </div>
+        <div class="form-group">
+            <label for="tense">Tense:</label>
+            <span id="tenseDisplay"></span>
+        </div>
+        <div class="form-group">
+            <label for="conjugations">Conjugations:</label><br>
+            <br>
+            <input type="text" id="conjugation1" placeholder="Yo"><br>
+            <input type="text" id="conjugation2" placeholder="Tu"><br>
+            <input type="text" id="conjugation3" placeholder="Ella / El / Usted"><br>
+            <input type="text" id="conjugation4" placeholder="Nosotras"><br>
+            <input type="text" id="conjugation5" placeholder="Vosotros"><br>
+            <input type="text" id="conjugation6" placeholder="Ellos / Ustedes"><br>
+        </div>
+        <div class="button-container">
+            <button onclick="checkConjugations()">Check</button>
+            <button onclick="nextVerb()">Next</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const verbs = {
+    "ser": {
+        "present": ["soy", "eres", "es", "somos", "sois", "son"],
+        "preterite": ["fui", "fuiste", "fue", "fuimos", "fuisteis", "fueron"],
+        "imperfect": ["era", "eras", "era", "éramos", "erais", "eran"],
+        "future": ["seré", "serás", "será", "seremos", "seréis", "serán"],
+        "preterite_perfect": ["he sido", "has sido", "ha sido", "hemos sido", "habéis sido", "han sido"]
+    },
+    "haber": {
+        "present": ["he", "has", "ha", "hemos", "habéis", "han"],
+        "preterite": ["hube", "hubiste", "hubo", "hubimos", "hubisteis", "hubieron"],
+        "imperfect": ["había", "habías", "había", "habíamos", "habíais", "habían"],
+        "future": ["habré", "habrás", "habrá", "habremos", "habréis", "habrán"],
+        "preterite_perfect": ["he habido", "has habido", "ha habido", "hemos habido", "habéis habido", "han habido"]
+    },
+    "estar": {
+        "present": ["estoy", "estás", "está", "estamos", "estáis", "están"],
+        "preterite": ["estuve", "estuviste", "estuvo", "estuvimos", "estuvisteis", "estuvieron"],
+        "imperfect": ["estaba", "estabas", "estaba", "estábamos", "estabais", "estaban"],
+        "future": ["estaré", "estarás", "estará", "estaremos", "estaréis", "estarán"],
+        "preterite_perfect": ["he estado", "has estado", "ha estado", "hemos estado", "habéis estado", "han estado"]
+    },
+    "tener": {
+        "present": ["tengo", "tienes", "tiene", "tenemos", "tenéis", "tienen"],
+        "preterite": ["tuve", "tuviste", "tuvo", "tuvimos", "tuvisteis", "tuvieron"],
+        "imperfect": ["tenía", "tenías", "tenía", "teníamos", "teníais", "tenían"],
+        "future": ["tendré", "tendrás", "tendrá", "tendremos", "tendréis", "tendrán"],
+        "preterite_perfect": ["he tenido", "has tenido", "ha tenido", "hemos tenido", "habéis tenido", "han tenido"]
+    },
+    "hacer": {
+        "present": ["hago", "haces", "hace", "hacemos", "hacéis", "hacen"],
+        "preterite": ["hice", "hiciste", "hizo", "hicimos", "hicisteis", "hicieron"],
+        "imperfect": ["hacía", "hacías", "hacía", "hacíamos", "hacíais", "hacían"],
+        "future": ["haré", "harás", "hará", "haremos", "haréis", "harán"],
+        "preterite_perfect": ["he hecho", "has hecho", "ha hecho", "hemos hecho", "habéis hecho", "han hecho"]
+    },
+    "poder": {
+        "present": ["puedo", "puedes", "puede", "podemos", "podéis", "pueden"],
+        "preterite": ["pude", "pudiste", "pudo", "pudimos", "pudisteis", "pudieron"],
+        "imperfect": ["podía", "podías", "podía", "podíamos", "podíais", "podían"],
+        "future": ["podré", "podrás", "podrá", "podremos", "podréis", "podrán"],
+        "preterite_perfect": ["he podido", "has podido", "ha podido", "hemos podido", "habéis podido", "han podido"]
+    },
+    "decir": {
+        "present": ["digo", "dices", "dice", "decimos", "decís", "dicen"],
+        "preterite": ["dije", "dijiste", "dijo", "dijimos", "dijisteis", "dijeron"],
+        "imperfect": ["decía", "decías", "decía", "decíamos", "decíais", "decían"],
+        "future": ["diré", "dirás", "dirá", "diremos", "diréis", "dirán"],
+        "preterite_perfect": ["he dicho", "has dicho", "ha dicho", "hemos dicho", "habéis dicho", "han dicho"]
+    },
+    "ir": {
+        "present": ["voy", "vas", "va", "vamos", "vais", "van"],
+        "preterite": ["fui", "fuiste", "fue", "fuimos", "fuisteis", "fueron"],
+        "imperfect": ["iba", "ibas", "iba", "íbamos", "ibais", "iban"],
+        "future": ["iré", "irás", "irá", "iremos", "iréis", "irán"],
+        "preterite_perfect": ["he ido", "has ido", "ha ido", "hemos ido", "habéis ido", "han ido"]
+    },
+    "ver": {
+        "present": ["veo", "ves", "ve", "vemos", "veis", "ven"],
+        "preterite": ["vi", "viste", "vio", "vimos", "visteis", "vieron"],
+        "imperfect": ["veía", "veías", "veía", "veíamos", "veíais", "veían"],
+        "future": ["veré", "verás", "verá", "veremos", "veréis", "verán"],
+        "preterite_perfect": ["he visto", "has visto", "ha visto", "hemos visto", "habéis visto", "han visto"]
+    },
+    "dar": {
+        "present": ["doy", "das", "da", "damos", "dais", "dan"],
+        "preterite": ["di", "diste", "dio", "dimos", "disteis", "dieron"],
+        "imperfect": ["daba", "dabas", "daba", "dábamos", "dabais", "daban"],
+        "future": ["daré", "darás", "dará", "daremos", "daréis", "darán"],
+        "preterite_perfect": ["he dado", "has dado", "ha dado", "hemos dado", "habéis dado", "han dado"]
+    },
+    "saber": {
+        "present": ["sé", "sabes", "sabe", "sabemos", "sabéis", "saben"],
+        "preterite": ["supe", "supiste", "supo", "supimos", "supisteis", "supieron"],
+        "imperfect": ["sabía", "sabías", "sabía", "sabíamos", "sabíais", "sabían"],
+        "future": ["sabré", "sabrás", "sabrá", "sabremos", "sabréis", "sabrán"],
+        "preterite_perfect": ["he sabido", "has sabido", "ha sabido", "hemos sabido", "habéis sabido", "han sabido"]
+    },
+    "querer": {
+        "present": ["quiero", "quieres", "quiere", "queremos", "queréis", "quieren"],
+        "preterite": ["quise", "quisiste", "quiso", "quisimos", "quisisteis", "quisieron"],
+        "imperfect": ["quería", "querías", "quería", "queríamos", "queríais", "querían"],
+        "future": ["querré", "querrás", "querrá", "querremos", "querréis", "querrán"],
+        "preterite_perfect": ["he querido", "has querido", "ha querido", "hemos querido", "habéis querido", "han querido"]
+    },
+    "llegar": {
+        "present": ["llego", "llegas", "llega", "llegamos", "llegáis", "llegan"],
+        "preterite": ["llegué", "llegaste", "llegó", "llegamos", "llegasteis", "llegaron"],
+        "imperfect": ["llegaba", "llegabas", "llegaba", "llegábamos", "llegabais", "llegaban"],
+        "future": ["llegaré", "llegarás", "llegará", "llegaremos", "llegaréis", "llegarán"],
+        "preterite_perfect": ["he llegado", "has llegado", "ha llegado", "hemos llegado", "habéis llegado", "han llegado"]
+    },
+    "pasar": {
+        "present": ["paso", "pasas", "pasa", "pasamos", "pasáis", "pasan"],
+        "preterite": ["pasé", "pasaste", "pasó", "pasamos", "pasasteis", "pasaron"],
+        "imperfect": ["pasaba", "pasabas", "pasaba", "pasábamos", "pasabais", "pasaban"],
+        "future": ["pasaré", "pasarás", "pasará", "pasaremos", "pasaréis", "pasarán"],
+        "preterite_perfect": ["he pasado", "has pasado", "ha pasado", "hemos pasado", "habéis pasado", "han pasado"]
+    },
+    "deber": {
+        "present": ["debo", "debes", "debe", "debemos", "debéis", "deben"],
+        "preterite": ["debí", "debiste", "debió", "debimos", "debisteis", "debieron"],
+        "imperfect": ["debía", "debías", "debía", "debíamos", "debíais", "debían"],
+        "future": ["deberé", "deberás", "deberá", "deberemos", "deberéis", "deberán"],
+        "preterite_perfect": ["he debido", "has debido", "ha debido", "hemos debido", "habéis debido", "han debido"]
+    },
+    "poner": {
+        "present": ["pongo", "pones", "pone", "ponemos", "ponéis", "ponen"],
+        "preterite": ["puse", "pusiste", "puso", "pusimos", "pusisteis", "pusieron"],
+        "imperfect": ["ponía", "ponías", "ponía", "poníamos", "poníais", "ponían"],
+        "future": ["pondré", "pondrás", "pondrá", "pondremos", "pondréis", "pondrán"],
+        "preterite_perfect": ["he puesto", "has puesto", "ha puesto", "hemos puesto", "habéis puesto", "han puesto"]
+    },
+    "parecer": {
+        "present": ["parezco", "pareces", "parece", "parecemos", "parecéis", "parecen"],
+        "preterite": ["parecí", "pareciste", "pareció", "parecimos", "parecisteis", "parecieron"],
+        "imperfect": ["parecía", "parecías", "parecía", "parecíamos", "parecíais", "parecían"],
+        "future": ["pareceré", "parecerás", "parecerá", "pareceremos", "pareceréis", "parecerán"],
+        "preterite_perfect": ["he parecido", "has parecido", "ha parecido", "hemos parecido", "habéis parecido", "han parecido"]
+    },
+    "quedar": {
+        "present": ["quedo", "quedas", "queda", "quedamos", "quedáis", "quedan"],
+        "preterite": ["quedé", "quedaste", "quedó", "quedamos", "quedasteis", "quedaron"],
+        "imperfect": ["quedaba", "quedabas", "quedaba", "quedábamos", "quedabais", "quedaban"],
+        "future": ["quedaré", "quedarás", "quedará", "quedaremos", "quedaréis", "quedarán"],
+        "preterite_perfect": ["he quedado", "has quedado", "ha quedado", "hemos quedado", "habéis quedado", "han quedado"]
+    },
+    "creer": {
+        "present": ["creo", "crees", "cree", "creemos", "creéis", "creen"],
+        "preterite": ["creí", "creíste", "creyó", "creímos", "creísteis", "creyeron"],
+        "imperfect": ["creía", "creías", "creía", "creíamos", "creíais", "creían"],
+        "future": ["creeré", "creerás", "creerá", "creeremos", "creeréis", "creerán"],
+        "preterite_perfect": ["he creído", "has creído", "ha creído", "hemos creído", "habéis creído", "han creído"]
+    },
+    "hablar": {
+        "present": ["hablo", "hablas", "habla", "hablamos", "habláis", "hablan"],
+        "preterite": ["hablé", "hablaste", "habló", "hablamos", "hablasteis", "hablaron"],
+        "imperfect": ["hablaba", "hablabas", "hablaba", "hablábamos", "hablabais", "hablaban"],
+        "future": ["hablaré", "hablarás", "hablará", "hablaremos", "hablaréis", "hablarán"],
+        "preterite_perfect": ["he hablado", "has hablado", "ha hablado", "hemos hablado", "habéis hablado", "han hablado"]
+    },
+    "llevar": {
+        "present": ["llevo", "llevas", "lleva", "llevamos", "lleváis", "llevan"],
+        "preterite": ["llevé", "llevaste", "llevó", "llevamos", "llevasteis", "llevaron"],
+        "imperfect": ["llevaba", "llevabas", "llevaba", "llevábamos", "llevabais", "llevaban"],
+        "future": ["llevaré", "llevarás", "llevará", "llevaremos", "llevaréis", "llevarán"],
+        "preterite_perfect": ["he llevado", "has llevado", "ha llevado", "hemos llevado", "habéis llevado", "han llevado"]
+    },
+    "dejar": {
+        "present": ["dejo", "dejas", "deja", "dejamos", "dejáis", "dejan"],
+        "preterite": ["dejé", "dejaste", "dejó", "dejamos", "dejasteis", "dejaron"],
+        "imperfect": ["dejaba", "dejabas", "dejaba", "dejábamos", "dejabais", "dejaban"],
+        "future": ["dejaré", "dejarás", "dejará", "dejaremos", "dejaréis", "dejarán"],
+        "preterite_perfect": ["he dejado", "has dejado", "ha dejado", "hemos dejado", "habéis dejado", "han dejado"]
+    },
+    "seguir": {
+        "present": ["sigo", "sigues", "sigue", "seguimos", "seguís", "siguen"],
+        "preterite": ["seguí", "seguiste", "siguió", "seguimos", "seguisteis", "siguieron"],
+        "imperfect": ["seguía", "seguías", "seguía", "seguíamos", "seguíais", "seguían"],
+        "future": ["seguiré", "seguirás", "seguirá", "seguiremos", "seguiréis", "seguirán"],
+        "preterite_perfect": ["he seguido", "has seguido", "ha seguido", "hemos seguido", "habéis seguido", "han seguido"]
+    },
+    "encontrar": {
+        "present": ["encuentro", "encuentras", "encuentra", "encontramos", "encontráis", "encuentran"],
+        "preterite": ["encontré", "encontraste", "encontró", "encontramos", "encontrasteis", "encontraron"],
+        "imperfect": ["encontraba", "encontrabas", "encontraba", "encontrábamos", "encontrabais", "encontraban"],
+        "future": ["encontraré", "encontrarás", "encontrará", "encontraremos", "encontraréis", "encontrarán"],
+        "preterite_perfect": ["he encontrado", "has encontrado", "ha encontrado", "hemos encontrado", "habéis encontrado", "han encontrado"]
+    },
+    "llamar": {
+        "present": ["llamo", "llamas", "llama", "llamamos", "llamáis", "llaman"],
+        "preterite": ["llamé", "llamaste", "llamó", "llamamos", "llamasteis", "llamaron"],
+        "imperfect": ["llamaba", "llamabas", "llamaba", "llamábamos", "llamabais", "llamaban"],
+        "future": ["llamaré", "llamarás", "llamará", "llamaremos", "llamaréis", "llamarán"],
+        "preterite_perfect": ["he llamado", "has llamado", "ha llamado", "hemos llamado", "habéis llamado", "han llamado"]
+    }
+};
+
+        let currentVerb;
+        let currentTense;
+        let attempts = 0;
+        let perfectScoreCounter = 0;
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function nextVerb() {
+            currentVerb = getRandomElement(Object.keys(verbs));
+            currentTense = getRandomElement(Object.keys(verbs[currentVerb]));
+            document.getElementById('verbDisplay').innerText = currentVerb;
+            document.getElementById('tenseDisplay').innerText = currentTense;
+            clearInputs();
+            document.getElementById('result').innerText = '';
+            attempts = 0;
+        }
+
+        function clearInputs() {
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById('conjugation' + i).value = '';
+                document.getElementById('conjugation' + i).classList.remove('correct');
+            }
+        }
+
+        function checkConjugations() {
+            attempts++;
+            const userConjugations = [];
+            for (let i = 1; i <= 6; i++) {
+                userConjugations.push(document.getElementById('conjugation' + i).value.trim());
+            }
+            const correctConjugations = verbs[currentVerb][currentTense];
+            let score = 0;
+            let resultText = '';
+
+            for (let i = 0; i < 6; i++) {
+                if (userConjugations[i] === correctConjugations[i]) {
+                    score++;
+                    document.getElementById('conjugation' + (i + 1)).classList.add('correct');
+                } else {
+                    document.getElementById('conjugation' + (i + 1)).classList.remove('correct');
+                }
+            }
+
+            if (score === 6) {
+                perfectScoreCounter++;
+                document.getElementById('perfectScoreCounter').innerText = perfectScoreCounter;
+            }
+
+            if (attempts >= 3) {
+                resultText = 'Correct conjugations:<br>';
+                for (let i = 0; i < 6; i++) {
+                    resultText += `(${i + 1}) ${correctConjugations[i]}<br>`;
+                }
+            }
+
+            document.getElementById('result').innerHTML = `Your score: ${score} out of 6<br>${resultText}`;
+        }
+
+        window.onload = function () {
+            nextVerb(); 
+        }
+    </script>
+</body>
+</html>
