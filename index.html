@@ -2,523 +2,1012 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spanish Verb Conjugation Practice</title>
+    <title>Random Forest vs LightGBM Visualization</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
         }
-        h1, h2 {
-            text-align: center;
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
         }
-        .form-group {
+        
+        .title {
+            text-align: center;
+            font-size: 2.8em;
+            font-weight: bold;
             margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #007AFF;
-            color: #fff;
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #e1e8ff;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            margin: 5px 10px;
             cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        button:hover {
-            background-color: #0056b3;
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        input[type="text"] {
-            padding: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 5px;
+        
+        .btn.active {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .example-data {
+            background: #fffbf0;
+            border: 2px solid #ffd93d;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .example-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .data-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .data-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .data-label {
+            font-size: 0.9em;
+            color: #666;
             margin-bottom: 5px;
         }
-        .result {
+        
+        .data-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .models-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .model-section {
+            background: #f8f9ff;
+            border-radius: 20px;
+            padding: 25px;
+            border: 3px solid #e1e8ff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .model-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .model-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
             text-align: center;
+            color: #333;
+        }
+        
+        .trees-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .tree {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            min-width: 120px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tree:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .tree-header {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .tree-visual {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            line-height: 1.2;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .tree-structure {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #e1e8ff;
+        }
+        
+        .structure-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .tree-diagram {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .tree-node {
+            position: relative;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 5px;
+            text-align: center;
+            font-size: 0.85em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 100px;
+        }
+        
+        .tree-node.leaf {
+            background: #e8f5e8;
+            border-color: #00b894;
+            font-weight: bold;
+        }
+        
+        .tree-node.root {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        
+        .tree-levels {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .tree-level {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tree-connection {
+            width: 2px;
+            height: 15px;
+            background: #667eea;
+            margin: 0 auto;
+        }
+        
+        .forest-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .mini-tree {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .mini-tree-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        
+        .mini-tree-structure {
+            font-family: 'Courier New', monospace;
+            font-size: 0.7em;
+            line-height: 1.3;
+            color: #333;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        
+        .boosting-sequence {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .boost-step {
+            background: white;
+            border: 2px solid #ff6b6b;
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .boost-step::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .boost-content {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .boost-tree {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            line-height: 1.2;
+            background: #f8f9ff;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .boost-arrow {
+            font-size: 1.5em;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .boost-result {
+            background: #fff0f0;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .tree-prediction {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .ensemble-result {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .result-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
             margin-top: 20px;
         }
         
-        button.check {
-            margin-right: 10px;
+        .result-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 12px;
         }
-        button.next {
-            margin-left: 10px;
+        
+        .result-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
-        .correct {
-            background-color: #d4edda;
+        
+        .result-label {
+            font-size: 0.9em;
+            opacity: 0.9;
         }
-    </style>    
+        
+        .algorithm-steps {
+            background: #f0f4ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .step-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .step {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 0.95em;
+        }
+        
+        .lgbm-steps {
+            background: #fff0f0;
+        }
+        
+        .lgbm-steps .step {
+            border-left-color: #ff6b6b;
+        }
+        
+        .boosting-animation {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .boosting-animation.active {
+            display: block;
+        }
+        
+        .weak-learner {
+            display: inline-block;
+            background: #ffe6e6;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 5px;
+            transition: all 0.5s ease;
+        }
+        
+        .weak-learner.improving {
+            background: #e6ffe6;
+            border-color: #00b894;
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 1200px) {
+            .models-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .feature-importance {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .importance-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .importance-label {
+            min-width: 120px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .importance-visual {
+            flex: 1;
+            height: 20px;
+            background: #e1e8ff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        
+        .importance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 1s ease;
+        }
+        
+        .importance-value {
+            font-size: 0.8em;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Conjugation Practice</h1>
-        <h2>Perfect Scores: <span id="perfectScoreCounter">0</span></h2>
-        <div class="form-group">
-            <label for="verb">Verb:</label>
-            <span id="verbDisplay"></span>
+        <div class="title">🌳 Random Forest vs 🚀 LightGBM</div>
+        <div class="subtitle">Visual Comparison: How They Work Internally</div>
+        
+        <div class="controls">
+            <button class="btn active" onclick="showExample('simple')">Simple Example</button>
+            <button class="btn" onclick="showExample('ga')">GA Prediction Example</button>
         </div>
-        <div class="form-group">
-            <label for="tense">Tense:</label>
-            <span id="tenseDisplay"></span>
+        
+        <div class="example-data" id="example-data">
+            <div class="example-title">Example Product Data</div>
+            <div class="data-table" id="data-table">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div style="text-align: center; font-weight: bold; font-size: 1.1em; color: #333; margin-top: 15px;">
+                🎯 Target: <span id="target-value">Predict Days to GA</span>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="conjugations">Conjugations:</label><br>
-            <br>
-            <input type="text" id="conjugation1" placeholder="Yo"><br>
-            <input type="text" id="conjugation2" placeholder="Tu"><br>
-            <input type="text" id="conjugation3" placeholder="Ella / El / Usted"><br>
-            <input type="text" id="conjugation4" placeholder="Nosotras"><br>
-            <input type="text" id="conjugation5" placeholder="Vosotros"><br>
-            <input type="text" id="conjugation6" placeholder="Ellos / Ustedes"><br>
+        
+        <div class="models-container">
+            <!-- Random Forest Section -->
+            <div class="model-section">
+                <div class="model-title">🌳 Random Forest</div>
+                <div class="algorithm-steps">
+                    <strong>How it works:</strong>
+                    <div class="step-list">
+                        <div class="step">1. Bootstrap sample data (with replacement)</div>
+                        <div class="step">2. Random feature subset per split</div>
+                        <div class="step">3. Grow many deep, independent trees</div>
+                        <div class="step">4. Average all tree predictions</div>
+                    </div>
+                </div>
+                
+                <div class="tree-structure">
+                    <div class="structure-title">🌳 Random Forest Structure</div>
+                    <div id="rf-forest-visual">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="trees-container" id="rf-trees">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <div class="feature-importance">
+                    <strong>Feature Importance (RF):</strong>
+                    <div id="rf-importance">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LightGBM Section -->
+            <div class="model-section">
+                <div class="model-title">🚀 LightGBM</div>
+                <div class="algorithm-steps lgbm-steps">
+                    <strong>How it works:</strong>
+                    <div class="step-list">
+                        <div class="step">1. Start with simple prediction (mean)</div>
+                        <div class="step">2. Calculate residuals (errors)</div>
+                        <div class="step">3. Train tree to predict residuals</div>
+                        <div class="step">4. Add tree × learning_rate to ensemble</div>
+                        <div class="step">5. Repeat 2500 times, improving each iteration</div>
+                    </div>
+                </div>
+                
+                <div class="tree-structure">
+                    <div class="structure-title">🚀 LightGBM Boosting Sequence</div>
+                    <div id="lgb-sequence-visual">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="boosting-animation" id="boosting-animation">
+                    <div style="margin-bottom: 15px; font-weight: bold;">Boosting Process:</div>
+                    <div id="boosting-steps"></div>
+                </div>
+                
+                <div class="trees-container" id="lgb-trees">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <div class="feature-importance">
+                    <strong>Feature Importance (LightGBM):</strong>
+                    <div id="lgb-importance">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="button-container">
-            <button onclick="checkConjugations()">Check</button>
-            <button onclick="nextVerb()">Next</button>
+        
+        <div class="ensemble-result" id="ensemble-result">
+            <div class="result-title">🎯 Ensemble Prediction</div>
+            <div style="font-size: 1.2em; margin-bottom: 20px;">
+                Weighted Average: <span id="ensemble-weight">w=0.65</span> × RF + <span id="ensemble-weight-2">w=0.35</span> × LightGBM
+            </div>
+            <div class="result-details">
+                <div class="result-item">
+                    <div class="result-value" id="rf-pred">187 days</div>
+                    <div class="result-label">Random Forest</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="lgb-pred">201 days</div>
+                    <div class="result-label">LightGBM</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="ensemble-pred">192 days</div>
+                    <div class="result-label">Final Ensemble</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="confidence-interval">[145, 239]</div>
+                    <div class="result-label">95% Confidence</div>
+                </div>
+            </div>
         </div>
-        <div class="result" id="result"></div>
     </div>
 
     <script>
-        const verbs = {
-    "ser": {
-        "present": ["soy", "eres", "es", "somos", "sois", "son"],
-        "preterite": ["fui", "fuiste", "fue", "fuimos", "fuisteis", "fueron"],
-        "imperfect": ["era", "eras", "era", "éramos", "erais", "eran"],
-        "future": ["seré", "serás", "será", "seremos", "seréis", "serán"],
-        "preterite_perfect": ["he sido", "has sido", "ha sido", "hemos sido", "habéis sido", "han sido"]
-    },
-    "haber": {
-        "present": ["he", "has", "ha", "hemos", "habéis", "han"],
-        "preterite": ["hube", "hubiste", "hubo", "hubimos", "hubisteis", "hubieron"],
-        "imperfect": ["había", "habías", "había", "habíamos", "habíais", "habían"],
-        "future": ["habré", "habrás", "habrá", "habremos", "habréis", "habrán"],
-        "preterite_perfect": ["he habido", "has habido", "ha habido", "hemos habido", "habéis habido", "han habido"]
-    },
-    "estar": {
-        "present": ["estoy", "estás", "está", "estamos", "estáis", "están"],
-        "preterite": ["estuve", "estuviste", "estuvo", "estuvimos", "estuvisteis", "estuvieron"],
-        "imperfect": ["estaba", "estabas", "estaba", "estábamos", "estabais", "estaban"],
-        "future": ["estaré", "estarás", "estará", "estaremos", "estaréis", "estarán"],
-        "preterite_perfect": ["he estado", "has estado", "ha estado", "hemos estado", "habéis estado", "han estado"]
-    },
-    "tener": {
-        "present": ["tengo", "tienes", "tiene", "tenemos", "tenéis", "tienen"],
-        "preterite": ["tuve", "tuviste", "tuvo", "tuvimos", "tuvisteis", "tuvieron"],
-        "imperfect": ["tenía", "tenías", "tenía", "teníamos", "teníais", "tenían"],
-        "future": ["tendré", "tendrás", "tendrá", "tendremos", "tendréis", "tendrán"],
-        "preterite_perfect": ["he tenido", "has tenido", "ha tenido", "hemos tenido", "habéis tenido", "han tenido"]
-    },
-    "hacer": {
-        "present": ["hago", "haces", "hace", "hacemos", "hacéis", "hacen"],
-        "preterite": ["hice", "hiciste", "hizo", "hicimos", "hicisteis", "hicieron"],
-        "imperfect": ["hacía", "hacías", "hacía", "hacíamos", "hacíais", "hacían"],
-        "future": ["haré", "harás", "hará", "haremos", "haréis", "harán"],
-        "preterite_perfect": ["he hecho", "has hecho", "ha hecho", "hemos hecho", "habéis hecho", "han hecho"]
-    },
-    "poder": {
-        "present": ["puedo", "puedes", "puede", "podemos", "podéis", "pueden"],
-        "preterite": ["pude", "pudiste", "pudo", "pudimos", "pudisteis", "pudieron"],
-        "imperfect": ["podía", "podías", "podía", "podíamos", "podíais", "podían"],
-        "future": ["podré", "podrás", "podrá", "podremos", "podréis", "podrán"],
-        "preterite_perfect": ["he podido", "has podido", "ha podido", "hemos podido", "habéis podido", "han podido"]
-    },
-    "decir": {
-        "present": ["digo", "dices", "dice", "decimos", "decís", "dicen"],
-        "preterite": ["dije", "dijiste", "dijo", "dijimos", "dijisteis", "dijeron"],
-        "imperfect": ["decía", "decías", "decía", "decíamos", "decíais", "decían"],
-        "future": ["diré", "dirás", "dirá", "diremos", "diréis", "dirán"],
-        "preterite_perfect": ["he dicho", "has dicho", "ha dicho", "hemos dicho", "habéis dicho", "han dicho"]
-    },
-    "ir": {
-        "present": ["voy", "vas", "va", "vamos", "vais", "van"],
-        "preterite": ["fui", "fuiste", "fue", "fuimos", "fuisteis", "fueron"],
-        "imperfect": ["iba", "ibas", "iba", "íbamos", "ibais", "iban"],
-        "future": ["iré", "irás", "irá", "iremos", "iréis", "irán"],
-        "preterite_perfect": ["he ido", "has ido", "ha ido", "hemos ido", "habéis ido", "han ido"]
-    },
-    "ver": {
-        "present": ["veo", "ves", "ve", "vemos", "veis", "ven"],
-        "preterite": ["vi", "viste", "vio", "vimos", "visteis", "vieron"],
-        "imperfect": ["veía", "veías", "veía", "veíamos", "veíais", "veían"],
-        "future": ["veré", "verás", "verá", "veremos", "veréis", "verán"],
-        "preterite_perfect": ["he visto", "has visto", "ha visto", "hemos visto", "habéis visto", "han visto"]
-    },
-    "dar": {
-        "present": ["doy", "das", "da", "damos", "dais", "dan"],
-        "preterite": ["di", "diste", "dio", "dimos", "disteis", "dieron"],
-        "imperfect": ["daba", "dabas", "daba", "dábamos", "dabais", "daban"],
-        "future": ["daré", "darás", "dará", "daremos", "daréis", "darán"],
-        "preterite_perfect": ["he dado", "has dado", "ha dado", "hemos dado", "habéis dado", "han dado"]
-    },
-    "saber": {
-        "present": ["sé", "sabes", "sabe", "sabemos", "sabéis", "saben"],
-        "preterite": ["supe", "supiste", "supo", "supimos", "supisteis", "supieron"],
-        "imperfect": ["sabía", "sabías", "sabía", "sabíamos", "sabíais", "sabían"],
-        "future": ["sabré", "sabrás", "sabrá", "sabremos", "sabréis", "sabrán"],
-        "preterite_perfect": ["he sabido", "has sabido", "ha sabido", "hemos sabido", "habéis sabido", "han sabido"]
-    },
-    "querer": {
-        "present": ["quiero", "quieres", "quiere", "queremos", "queréis", "quieren"],
-        "preterite": ["quise", "quisiste", "quiso", "quisimos", "quisisteis", "quisieron"],
-        "imperfect": ["quería", "querías", "quería", "queríamos", "queríais", "querían"],
-        "future": ["querré", "querrás", "querrá", "querremos", "querréis", "querrán"],
-        "preterite_perfect": ["he querido", "has querido", "ha querido", "hemos querido", "habéis querido", "han querido"]
-    },
-    "llegar": {
-        "present": ["llego", "llegas", "llega", "llegamos", "llegáis", "llegan"],
-        "preterite": ["llegué", "llegaste", "llegó", "llegamos", "llegasteis", "llegaron"],
-        "imperfect": ["llegaba", "llegabas", "llegaba", "llegábamos", "llegabais", "llegaban"],
-        "future": ["llegaré", "llegarás", "llegará", "llegaremos", "llegaréis", "llegarán"],
-        "preterite_perfect": ["he llegado", "has llegado", "ha llegado", "hemos llegado", "habéis llegado", "han llegado"]
-    },
-    "pasar": {
-        "present": ["paso", "pasas", "pasa", "pasamos", "pasáis", "pasan"],
-        "preterite": ["pasé", "pasaste", "pasó", "pasamos", "pasasteis", "pasaron"],
-        "imperfect": ["pasaba", "pasabas", "pasaba", "pasábamos", "pasabais", "pasaban"],
-        "future": ["pasaré", "pasarás", "pasará", "pasaremos", "pasaréis", "pasarán"],
-        "preterite_perfect": ["he pasado", "has pasado", "ha pasado", "hemos pasado", "habéis pasado", "han pasado"]
-    },
-    "deber": {
-        "present": ["debo", "debes", "debe", "debemos", "debéis", "deben"],
-        "preterite": ["debí", "debiste", "debió", "debimos", "debisteis", "debieron"],
-        "imperfect": ["debía", "debías", "debía", "debíamos", "debíais", "debían"],
-        "future": ["deberé", "deberás", "deberá", "deberemos", "deberéis", "deberán"],
-        "preterite_perfect": ["he debido", "has debido", "ha debido", "hemos debido", "habéis debido", "han debido"]
-    },
-    "poner": {
-        "present": ["pongo", "pones", "pone", "ponemos", "ponéis", "ponen"],
-        "preterite": ["puse", "pusiste", "puso", "pusimos", "pusisteis", "pusieron"],
-        "imperfect": ["ponía", "ponías", "ponía", "poníamos", "poníais", "ponían"],
-        "future": ["pondré", "pondrás", "pondrá", "pondremos", "pondréis", "pondrán"],
-        "preterite_perfect": ["he puesto", "has puesto", "ha puesto", "hemos puesto", "habéis puesto", "han puesto"]
-    },
-    "parecer": {
-        "present": ["parezco", "pareces", "parece", "parecemos", "parecéis", "parecen"],
-        "preterite": ["parecí", "pareciste", "pareció", "parecimos", "parecisteis", "parecieron"],
-        "imperfect": ["parecía", "parecías", "parecía", "parecíamos", "parecíais", "parecían"],
-        "future": ["pareceré", "parecerás", "parecerá", "pareceremos", "pareceréis", "parecerán"],
-        "preterite_perfect": ["he parecido", "has parecido", "ha parecido", "hemos parecido", "habéis parecido", "han parecido"]
-    },
-    "quedar": {
-        "present": ["quedo", "quedas", "queda", "quedamos", "quedáis", "quedan"],
-        "preterite": ["quedé", "quedaste", "quedó", "quedamos", "quedasteis", "quedaron"],
-        "imperfect": ["quedaba", "quedabas", "quedaba", "quedábamos", "quedabais", "quedaban"],
-        "future": ["quedaré", "quedarás", "quedará", "quedaremos", "quedaréis", "quedarán"],
-        "preterite_perfect": ["he quedado", "has quedado", "ha quedado", "hemos quedado", "habéis quedado", "han quedado"]
-    },
-    "creer": {
-        "present": ["creo", "crees", "cree", "creemos", "creéis", "creen"],
-        "preterite": ["creí", "creíste", "creyó", "creímos", "creísteis", "creyeron"],
-        "imperfect": ["creía", "creías", "creía", "creíamos", "creíais", "creían"],
-        "future": ["creeré", "creerás", "creerá", "creeremos", "creeréis", "creerán"],
-        "preterite_perfect": ["he creído", "has creído", "ha creído", "hemos creído", "habéis creído", "han creído"]
-    },
-    "hablar": {
-        "present": ["hablo", "hablas", "habla", "hablamos", "habláis", "hablan"],
-        "preterite": ["hablé", "hablaste", "habló", "hablamos", "hablasteis", "hablaron"],
-        "imperfect": ["hablaba", "hablabas", "hablaba", "hablábamos", "hablabais", "hablaban"],
-        "future": ["hablaré", "hablarás", "hablará", "hablaremos", "hablaréis", "hablarán"],
-        "preterite_perfect": ["he hablado", "has hablado", "ha hablado", "hemos hablado", "habéis hablado", "han hablado"]
-    },
-    "llevar": {
-        "present": ["llevo", "llevas", "lleva", "llevamos", "lleváis", "llevan"],
-        "preterite": ["llevé", "llevaste", "llevó", "llevamos", "llevasteis", "llevaron"],
-        "imperfect": ["llevaba", "llevabas", "llevaba", "llevábamos", "llevabais", "llevaban"],
-        "future": ["llevaré", "llevarás", "llevará", "llevaremos", "llevaréis", "llevarán"],
-        "preterite_perfect": ["he llevado", "has llevado", "ha llevado", "hemos llevado", "habéis llevado", "han llevado"]
-    },
-    "dejar": {
-        "present": ["dejo", "dejas", "deja", "dejamos", "dejáis", "dejan"],
-        "preterite": ["dejé", "dejaste", "dejó", "dejamos", "dejasteis", "dejaron"],
-        "imperfect": ["dejaba", "dejabas", "dejaba", "dejábamos", "dejabais", "dejaban"],
-        "future": ["dejaré", "dejarás", "dejará", "dejaremos", "dejaréis", "dejarán"],
-        "preterite_perfect": ["he dejado", "has dejado", "ha dejado", "hemos dejado", "habéis dejado", "han dejado"]
-    },
-    "seguir": {
-        "present": ["sigo", "sigues", "sigue", "seguimos", "seguís", "siguen"],
-        "preterite": ["seguí", "seguiste", "siguió", "seguimos", "seguisteis", "siguieron"],
-        "imperfect": ["seguía", "seguías", "seguía", "seguíamos", "seguíais", "seguían"],
-        "future": ["seguiré", "seguirás", "seguirá", "seguiremos", "seguiréis", "seguirán"],
-        "preterite_perfect": ["he seguido", "has seguido", "ha seguido", "hemos seguido", "habéis seguido", "han seguido"]
-    },
-    "encontrar": {
-        "present": ["encuentro", "encuentras", "encuentra", "encontramos", "encontráis", "encuentran"],
-        "preterite": ["encontré", "encontraste", "encontró", "encontramos", "encontrasteis", "encontraron"],
-        "imperfect": ["encontraba", "encontrabas", "encontraba", "encontrábamos", "encontrabais", "encontraban"],
-        "future": ["encontraré", "encontrarás", "encontrará", "encontraremos", "encontraréis", "encontrarán"],
-        "preterite_perfect": ["he encontrado", "has encontrado", "ha encontrado", "hemos encontrado", "habéis encontrado", "han encontrado"]
-    },
-    "llamar": {
-        "present": ["llamo", "llamas", "llama", "llamamos", "llamáis", "llaman"],
-        "preterite": ["llamé", "llamaste", "llamó", "llamamos", "llamasteis", "llamaron"],
-        "imperfect": ["llamaba", "llamabas", "llamaba", "llamábamos", "llamabais", "llamaban"],
-        "future": ["llamaré", "llamarás", "llamará", "llamaremos", "llamaréis", "llamarán"],
-        "preterite_perfect": ["he llamado", "has llamado", "ha llamado", "hemos llamado", "habéis llamado", "han llamado"]
-    },
-    "vivir": {
-        "present": ["vivo", "vives", "vive", "vivimos", "vivís", "viven"],
-        "preterite": ["viví", "viviste", "vivió", "vivimos", "vivisteis", "vivieron"],
-        "imperfect": ["vivía", "vivías", "vivía", "vivíamos", "vivíais", "vivían"],
-        "future": ["viviré", "vivirás", "vivirá", "viviremos", "viviréis", "vivirán"],
-        "preterite_perfect": ["he vivido", "has vivido", "ha vivido", "hemos vivido", "habéis vivido", "han vivido"]
-    },
-    "comer": {
-        "present": ["como", "comes", "come", "comemos", "coméis", "comen"],
-        "preterite": ["comí", "comiste", "comió", "comimos", "comisteis", "comieron"],
-        "imperfect": ["comía", "comías", "comía", "comíamos", "comíais", "comían"],
-        "future": ["comeré", "comerás", "comerá", "comeremos", "comeréis", "comerán"],
-        "preterite_perfect": ["he comido", "has comido", "ha comido", "hemos comido", "habéis comido", "han comido"]
-    },
-    "escribir": {
-        "present": ["escribo", "escribes", "escribe", "escribimos", "escribís", "escriben"],
-        "preterite": ["escribí", "escribiste", "escribió", "escribimos", "escribisteis", "escribieron"],
-        "imperfect": ["escribía", "escribías", "escribía", "escribíamos", "escribíais", "escribían"],
-        "future": ["escribiré", "escribirás", "escribirá", "escribiremos", "escribiréis", "escribirán"],
-        "preterite_perfect": ["he escrito", "has escrito", "ha escrito", "hemos escrito", "habéis escrito", "han escrito"]
-    },
-    "beber": {
-        "present": ["bebo", "bebes", "bebe", "bebemos", "bebéis", "beben"],
-        "preterite": ["bebí", "bebiste", "bebió", "bebimos", "bebisteis", "bebieron"],
-        "imperfect": ["bebía", "bebías", "bebía", "bebíamos", "bebíais", "bebían"],
-        "future": ["beberé", "beberás", "beberá", "beberemos", "beberéis", "beberán"],
-        "preterite_perfect": ["he bebido", "has bebido", "ha bebido", "hemos bebido", "habéis bebido", "han bebido"]
-    },
-    "estudiar": {
-        "present": ["estudio", "estudias", "estudia", "estudiamos", "estudiáis", "estudian"],
-        "preterite": ["estudié", "estudiaste", "estudió", "estudiamos", "estudiasteis", "estudiaron"],
-        "imperfect": ["estudiaba", "estudiabas", "estudiaba", "estudiábamos", "estudiabais", "estudiaban"],
-        "future": ["estudiaré", "estudiarás", "estudiará", "estudiaremos", "estudiaréis", "estudiarán"],
-        "preterite_perfect": ["he estudiado", "has estudiado", "ha estudiado", "hemos estudiado", "habéis estudiado", "han estudiado"]
-    },
-    "leer": {
-        "present": ["leo", "lees", "lee", "leemos", "leéis", "leen"],
-        "preterite": ["leí", "leíste", "leyó", "leímos", "leísteis", "leyeron"],
-        "imperfect": ["leía", "leías", "leía", "leíamos", "leíais", "leían"],
-        "future": ["leeré", "leerás", "leerá", "leeremos", "leeréis", "leerán"],
-        "preterite_perfect": ["he leído", "has leído", "ha leído", "hemos leído", "habéis leído", "han leído"]
-    },
-    "correr": {
-        "present": ["corro", "corres", "corre", "corremos", "corréis", "corren"],
-        "preterite": ["corrí", "corriste", "corrió", "corrimos", "corristeis", "corrieron"],
-        "imperfect": ["corría", "corrías", "corría", "corríamos", "corríais", "corrían"],
-        "future": ["correré", "correrás", "correrá", "correremos", "correréis", "correrán"],
-        "preterite_perfect": ["he corrido", "has corrido", "ha corrido", "hemos corrido", "habéis corrido", "han corrido"]
-    },
-    "comprar": {
-        "present": ["compro", "compras", "compra", "compramos", "compráis", "compran"],
-        "preterite": ["compré", "compraste", "compró", "compramos", "comprasteis", "compraron"],
-        "imperfect": ["compraba", "comprabas", "compraba", "comprábamos", "comprabais", "compraban"],
-        "future": ["compraré", "comprarás", "comprará", "compraremos", "compraréis", "comprarán"],
-        "preterite_perfect": ["he comprado", "has comprado", "ha comprado", "hemos comprado", "habéis comprado", "han comprado"]
-    },
-    "caminar": {
-        "present": ["camino", "caminas", "camina", "caminamos", "camináis", "caminan"],
-        "preterite": ["caminé", "caminaste", "caminó", "caminamos", "caminasteis", "caminaron"],
-        "imperfect": ["caminaba", "caminabas", "caminaba", "caminábamos", "caminabais", "caminaban"],
-        "future": ["caminaré", "caminarás", "caminará", "caminaremos", "caminaréis", "caminarán"],
-        "preterite_perfect": ["he caminado", "has caminado", "ha caminado", "hemos caminado", "habéis caminado", "han caminado"]
-    },
-    "saltar": {
-        "present": ["salto", "saltas", "salta", "saltamos", "saltáis", "saltan"],
-        "preterite": ["salté", "saltaste", "saltó", "saltamos", "saltasteis", "saltaron"],
-        "imperfect": ["saltaba", "saltabas", "saltaba", "saltábamos", "saltabais", "saltaban"],
-        "future": ["saltaré", "saltarás", "saltará", "saltaremos", "saltaréis", "saltarán"],
-        "preterite_perfect": ["he saltado", "has saltado", "ha saltado", "hemos saltado", "habéis saltado", "han saltado"]
-    },
-    "cocinar": {
-        "present": ["cocino", "cocinas", "cocina", "cocinamos", "cocináis", "cocinan"],
-        "preterite": ["cociné", "cocinaste", "cocinó", "cocinamos", "cocinasteis", "cocinaron"],
-        "imperfect": ["cocinaba", "cocinabas", "cocinaba", "cocinábamos", "cocinabais", "cocinaban"],
-        "future": ["cocinaré", "cocinarás", "cocinará", "cocinaremos", "cocinaréis", "cocinarán"],
-        "preterite_perfect": ["he cocinado", "has cocinado", "ha cocinado", "hemos cocinado", "habéis cocinado", "han cocinado"]
-    },
-    "dibujar": {
-        "present": ["dibujo", "dibujas", "dibuja", "dibujamos", "dibujáis", "dibujan"],
-        "preterite": ["dibujé", "dibujaste", "dibujó", "dibujamos", "dibujasteis", "dibujaron"],
-        "imperfect": ["dibujaba", "dibujabas", "dibujaba", "dibujábamos", "dibujabais", "dibujaban"],
-        "future": ["dibujaré", "dibujarás", "dibujará", "dibujaremos", "dibujaréis", "dibujarán"],
-        "preterite_perfect": ["he dibujado", "has dibujado", "ha dibujado", "hemos dibujado", "habéis dibujado", "han dibujado"]
-    },
-    "aprender": {
-        "present": ["aprendo", "aprendes", "aprende", "aprendemos", "aprendéis", "aprenden"],
-        "preterite": ["aprendí", "aprendiste", "aprendió", "aprendimos", "aprendisteis", "aprendieron"],
-        "imperfect": ["aprendía", "aprendías", "aprendía", "aprendíamos", "aprendíais", "aprendían"],
-        "future": ["aprenderé", "aprenderás", "aprenderá", "aprenderemos", "aprenderéis", "aprenderán"],
-        "preterite_perfect": ["he aprendido", "has aprendido", "ha aprendido", "hemos aprendido", "habéis aprendido", "han aprendido"]
-    },
-    "compartir": {
-        "present": ["comparto", "compartes", "comparte", "compartimos", "compartís", "comparten"],
-        "preterite": ["compartí", "compartiste", "compartió", "compartimos", "compartisteis", "compartieron"],
-        "imperfect": ["compartía", "compartías", "compartía", "compartíamos", "compartíais", "compartían"],
-        "future": ["compartiré", "compartirás", "compartirá", "compartiremos", "compartiréis", "compartirán"],
-        "preterite_perfect": ["he compartido", "has compartido", "ha compartido", "hemos compartido", "habéis compartido", "han compartido"]
-    },
-    "apoyar": {
-        "present": ["apoyo", "apoyas", "apoya", "apoyamos", "apoyáis", "apoyan"],
-        "preterite": ["apoyé", "apoyaste", "apoyó", "apoyamos", "apoyasteis", "apoyaron"],
-        "imperfect": ["apoyaba", "apoyabas", "apoyaba", "apoyábamos", "apoyabais", "apoyaban"],
-        "future": ["apoyaré", "apoyarás", "apoyará", "apoyaremos", "apoyaréis", "apoyarán"],
-        "preterite_perfect": ["he apoyado", "has apoyado", "ha apoyado", "hemos apoyado", "habéis apoyado", "han apoyado"]
-    },
-    "caminar": {
-        "present": ["camino", "caminas", "camina", "caminamos", "camináis", "caminan"],
-        "preterite": ["caminé", "caminaste", "caminó", "caminamos", "caminasteis", "caminaron"],
-        "imperfect": ["caminaba", "caminabas", "caminaba", "caminábamos", "caminabais", "caminaban"],
-        "future": ["caminaré", "caminarás", "caminará", "caminaremos", "caminaréis", "caminarán"],
-        "preterite_perfect": ["he caminado", "has caminado", "ha caminado", "hemos caminado", "habéis caminado", "han caminado"]
-    },
-    "correr": {
-        "present": ["corro", "corres", "corre", "corremos", "corréis", "corren"],
-        "preterite": ["corrí", "corriste", "corrió", "corrimos", "corristeis", "corrieron"],
-        "imperfect": ["corría", "corrías", "corría", "corríamos", "corríais", "corrían"],
-        "future": ["correré", "correrás", "correrá", "correremos", "correréis", "correrán"],
-        "preterite_perfect": ["he corrido", "has corrido", "ha corrido", "hemos corrido", "habéis corrido", "han corrido"]
-    },
-    "cantar": {
-        "present": ["canto", "cantas", "canta", "cantamos", "cantáis", "cantan"],
-        "preterite": ["canté", "cantaste", "cantó", "cantamos", "cantasteis", "cantaron"],
-        "imperfect": ["cantaba", "cantabas", "cantaba", "cantábamos", "cantabais", "cantaban"],
-        "future": ["cantaré", "cantarás", "cantará", "cantaremos", "cantaréis", "cantarán"],
-        "preterite_perfect": ["he cantado", "has cantado", "ha cantado", "hemos cantado", "habéis cantado", "han cantado"]
-    },
-    "bailar": {
-        "present": ["bailo", "bailas", "baila", "bailamos", "bailáis", "bailan"],
-        "preterite": ["bailé", "bailaste", "bailó", "bailamos", "bailasteis", "bailaron"],
-        "imperfect": ["bailaba", "bailabas", "bailaba", "bailábamos", "bailabais", "bailaban"],
-        "future": ["bailaré", "bailarás", "bailará", "bailaremos", "bailaréis", "bailarán"],
-        "preterite_perfect": ["he bailado", "has bailado", "ha bailado", "hemos bailado", "habéis bailado", "han bailado"]
-    },
-    "escuchar": {
-        "present": ["escucho", "escuchas", "escucha", "escuchamos", "escucháis", "escuchan"],
-        "preterite": ["escuché", "escuchaste", "escuchó", "escuchamos", "escuchasteis", "escucharon"],
-        "imperfect": ["escuchaba", "escuchabas", "escuchaba", "escuchábamos", "escuchabais", "escuchaban"],
-        "future": ["escucharé", "escucharás", "escuchará", "escucharemos", "escucharéis", "escucharán"],
-        "preterite_perfect": ["he escuchado", "has escuchado", "ha escuchado", "hemos escuchado", "habéis escuchado", "han escuchado"]
-    },
-    "observar": {
-        "present": ["observo", "observas", "observa", "observamos", "observáis", "observan"],
-        "preterite": ["observé", "observaste", "observó", "observamos", "observasteis", "observaron"],
-        "imperfect": ["observaba", "observabas", "observaba", "observábamos", "observabais", "observaban"],
-        "future": ["observaré", "observarás", "observará", "observaremos", "observaréis", "observarán"],
-        "preterite_perfect": ["he observado", "has observado", "ha observado", "hemos observado", "habéis observado", "han observado"]
-    },
-    "viajar": {
-        "present": ["viajo", "viajas", "viaja", "viajamos", "viajáis", "viajan"],
-        "preterite": ["viajé", "viajaste", "viajó", "viajamos", "viajasteis", "viajaron"],
-        "imperfect": ["viajaba", "viajabas", "viajaba", "viajábamos", "viajabais", "viajaban"],
-        "future": ["viajaré", "viajarás", "viajará", "viajaremos", "viajaréis", "viajarán"],
-        "preterite_perfect": ["he viajado", "has viajado", "ha viajado", "hemos viajado", "habéis viajado", "han viajado"]
-    },
-    "pintar": {
-        "present": ["pinto", "pintas", "pinta", "pintamos", "pintáis", "pintan"],
-        "preterite": ["pinté", "pintaste", "pintó", "pintamos", "pintasteis", "pintaron"],
-        "imperfect": ["pintaba", "pintabas", "pintaba", "pintábamos", "pintabais", "pintaban"],
-        "future": ["pintaré", "pintarás", "pintará", "pintaremos", "pintaréis", "pintarán"],
-        "preterite_perfect": ["he pintado", "has pintado", "ha pintado", "hemos pintado", "habéis pintado", "han pintado"]
-    },
-    "jugar": {
-        "present": ["juego", "juegas", "juega", "jugamos", "jugáis", "juegan"],
-        "preterite": ["jugué", "jugaste", "jugó", "jugamos", "jugasteis", "jugaron"],
-        "imperfect": ["jugaba", "jugabas", "jugaba", "jugábamos", "jugabais", "jugaban"],
-        "future": ["jugaré", "jugarás", "jugará", "jugaremos", "jugaréis", "jugarán"],
-        "preterite_perfect": ["he jugado", "has jugado", "ha jugado", "hemos jugado", "habéis jugado", "han jugado"]
-    },
-    "trabajar": {
-        "present": ["trabajo", "trabajas", "trabaja", "trabajamos", "trabajáis", "trabajan"],
-        "preterite": ["trabajé", "trabajaste", "trabajó", "trabajamos", "trabajasteis", "trabajaron"],
-        "imperfect": ["trabajaba", "trabajabas", "trabajaba", "trabajábamos", "trabajabais", "trabajaban"],
-        "future": ["trabajaré", "trabajarás", "trabajará", "trabajaremos", "trabajaréis", "trabajarán"],
-        "preterite_perfect": ["he trabajado", "has trabajado", "ha trabajado", "hemos trabajado", "habéis trabajado", "han trabajado"]
-    },
-    "nadar": {
-        "present": ["nado", "nadas", "nada", "nadamos", "nadáis", "nadan"],
-        "preterite": ["nadé", "nadaste", "nadó", "nadamos", "nadasteis", "nadaron"],
-        "imperfect": ["nadaba", "nadabas", "nadaba", "nadábamos", "nadabais", "nadaban"],
-        "future": ["nadaré", "nadarás", "nadará", "nadaremos", "nadaréis", "nadarán"],
-        "preterite_perfect": ["he nadado", "has nadado", "ha nadado", "hemos nadado", "habéis nadado", "han nadado"]
-    }
-};
-
-        let currentVerb;
-        let currentTense;
-        let attempts = 0;
-        let perfectScoreCounter = 0;
-
-        function getRandomElement(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        function nextVerb() {
-            currentVerb = getRandomElement(Object.keys(verbs));
-            currentTense = getRandomElement(Object.keys(verbs[currentVerb]));
-            document.getElementById('verbDisplay').innerText = currentVerb;
-            document.getElementById('tenseDisplay').innerText = currentTense;
-            clearInputs();
-            document.getElementById('result').innerText = '';
-            attempts = 0;
-        }
-
-        function clearInputs() {
-            for (let i = 1; i <= 6; i++) {
-                document.getElementById('conjugation' + i).value = '';
-                document.getElementById('conjugation' + i).classList.remove('correct');
+        let currentExample = 'simple';
+        let animationRunning = false;
+        
+        const examples = {
+            simple: {
+                features: [
+                    { label: 'Total Tasks', value: 42 },
+                    { label: 'Unique States', value: 7 },
+                    { label: 'Transitions (30d)', value: 18 },
+                    { label: 'Division', value: 'Office' },
+                    { label: 'Type', value: 'Feature' },
+                    { label: 'Age (days)', value: 85 }
+                ],
+                target: '192 days to GA',
+                rfPred: 187,
+                lgbPred: 201,
+                ensemblePred: 192,
+                confidence: '[145, 239]'
+            },
+            ga: {
+                features: [
+                    { label: 'Task Velocity', value: '0.31/day' },
+                    { label: 'State Entropy', value: 1.89 },
+                    { label: 'Time in Current', value: '12 days' },
+                    { label: 'Early Transitions', value: 24 },
+                    { label: 'Late Transitions', value: 8 },
+                    { label: 'Completion Rate', value: '76%' }
+                ],
+                target: 'Complex Enterprise Product',
+                rfPred: 284,
+                lgbPred: 267,
+                ensemblePred: 278,
+                confidence: '[198, 358]'
             }
+        };
+        
+        function showExample(type) {
+            currentExample = type;
+            
+            // Update button states
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const example = examples[type];
+            
+            // Update data table
+            const dataTable = document.getElementById('data-table');
+            dataTable.innerHTML = example.features.map(feature => `
+                <div class="data-item">
+                    <div class="data-label">${feature.label}</div>
+                    <div class="data-value">${feature.value}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('target-value').textContent = example.target;
+            
+            // Update predictions
+            document.getElementById('rf-pred').textContent = example.rfPred + ' days';
+            document.getElementById('lgb-pred').textContent = example.lgbPred + ' days';
+            document.getElementById('ensemble-pred').textContent = example.ensemblePred + ' days';
+            document.getElementById('confidence-interval').textContent = example.confidence;
+            
+            // Generate trees
+            generateTrees();
+            generateFeatureImportance();
         }
-
-        function checkConjugations() {
-    attempts++;
-    const userConjugations = [];
-    for (let i = 1; i <= 6; i++) {
-        userConjugations.push(document.getElementById('conjugation' + i).value.trim().toLowerCase());
-    }
-    const correctConjugations = verbs[currentVerb][currentTense].map(conjugation => conjugation.toLowerCase());
-    let score = 0;
-    let resultText = '';
-
-    for (let i = 0; i < 6; i++) {
-        if (userConjugations[i] === correctConjugations[i]) {
-            score++;
-            document.getElementById('conjugation' + (i + 1)).classList.add('correct');
-        } else {
-            document.getElementById('conjugation' + (i + 1)).classList.remove('correct');
+        
+        function generateTrees() {
+            // Random Forest Trees
+            const rfContainer = document.getElementById('rf-trees');
+            const rfTrees = [];
+            
+            for (let i = 0; i < 5; i++) {
+                const prediction = examples[currentExample].rfPred + (Math.random() - 0.5) * 40;
+                rfTrees.push(`
+                    <div class="tree">
+                        <div class="tree-header">Tree ${i + 1}</div>
+                        <div class="tree-visual">
+                            Tasks > 35?
+                               ├─Yes: ${Math.round(prediction + 20)}
+                               └─No: ${Math.round(prediction - 15)}
+                        </div>
+                        <div class="tree-prediction">${Math.round(prediction)} days</div>
+                    </div>
+                `);
+            }
+            rfContainer.innerHTML = rfTrees.join('');
+            
+            // Generate Random Forest Visual
+            generateRandomForestVisual();
+            
+            // LightGBM Sequential Trees
+            const lgbContainer = document.getElementById('lgb-trees');
+            const lgbTrees = [];
+            
+            for (let i = 0; i < 4; i++) {
+                const iteration = i * 625 + 1;
+                const residual = 45 - i * 10;
+                lgbTrees.push(`
+                    <div class="tree">
+                        <div class="tree-header">Iter ${iteration}</div>
+                        <div class="tree-visual">
+                            Residual
+                            Prediction:
+                            ${residual > 0 ? '+' : ''}${residual}
+                        </div>
+                        <div class="tree-prediction" style="background: #ff6b6b;">Step ${i + 1}</div>
+                    </div>
+                `);
+            }
+            lgbContainer.innerHTML = lgbTrees.join('');
+            
+            // Generate LightGBM Visual
+            generateLightGBMVisual();
         }
-    }
-
-    if (score === 6) {
-        perfectScoreCounter++;
-        document.getElementById('perfectScoreCounter').innerText = perfectScoreCounter;
-    }
-
-    if (attempts >= 3) {
-        resultText = 'Correct conjugations:<br>';
-        for (let i = 0; i < 6; i++) {
-            resultText += `(${i + 1}) ${correctConjugations[i]}<br>`;
+        
+        function generateRandomForestVisual() {
+            const forestContainer = document.getElementById('rf-forest-visual');
+            
+            // Create multiple mini-trees to show the forest
+            const forestHTML = `
+                <div style="text-align: center; margin-bottom: 20px; font-size: 1.1em;">
+                    <strong>100 Independent Trees (showing 6)</strong><br>
+                    <em>Each trained on different bootstrap sample + random features</em>
+                </div>
+                <div class="forest-container">
+                    <div class="mini-tree">
+                        <div class="mini-tree-title">Tree 1</div>
+                        <div class="mini-tree-structure">
+Tasks > 40?
+├─ Yes: Velocity > 0.3?
+│  ├─ Yes: 165 days
+│  └─ No: 195 days
+└─ No: Division=Office?
+   ├─ Yes: 220 days
+   └─ No: 240 days
+                        </div>
+                        <div class="tree-prediction">Pred: 187</div>
+                    </div>
+                    
+                    <div class="mini-tree">
+                        <div class="mini-tree-title">Tree 2</div>
+                        <div class="mini-tree-structure">
+States > 6?
+├─ Yes: Age > 80?
+│  ├─ Yes: 170 days
+│  └─ No: 200 days
+└─ No: Type=Feature?
+   ├─ Yes: 180 days
+   └─ No: 210 days
+                        </div>
+                        <div class="tree-prediction">Pred: 195</div>
+                    </div>
+                    
+                    <div class="mini-tree">
+                        <div class="mini-tree-title">Tree 3</div>
+                        <div class="mini-tree-structure">
+Transitions > 15?
+├─ Yes: Entropy > 1.8?
+│  ├─ Yes: 160 days
+│  └─ No: 185 days
+└─ No: 225 days
+                        </div>
+                        <div class="tree-prediction">Pred: 178</div>
+                    </div>
+                    
+                    <div class="mini-tree">
+                        <div class="mini-tree-title">Tree 4</div>
+                        <div class="mini-tree-structure">
+Division=Office?
+├─ Yes: Tasks > 45?
+│  ├─ Yes: 175 days
+│  └─ No: 205 days
+└─ No: Velocity > 0.25?
+   ├─ Yes: 190 days
+   └─ No: 230 days
+                        </div>
+                        <div class="tree-prediction">Pred: 192</div>
+                    </div>
+                    
+                    <div class="mini-tree">
+                        <div class="mini-tree-title">Tree 5</div>
+                        <div class="mini-tree-structure">
+Age > 90?
+├─ Yes: States > 5?
+│  ├─ Yes: 155 days
+│  └─ No: 180 days
+└─ No: Type=Feature?
+   ├─ Yes: 200 days
+   └─ No: 235 days
+                        </div>
+                        <div class="tree-prediction">Pred: 183</div>
+                    </div>
+                    
+                    <div class="mini-tree">
+                        <div class="mini-tree-title">... Tree 100</div>
+                        <div class="mini-tree-structure">
+Entropy > 1.5?
+├─ Yes: Transitions > 20?
+│  ├─ Yes: 168 days
+│  └─ No: 195 days
+└─ No: Division=Office?
+   ├─ Yes: 215 days
+   └─ No: 245 days
+                        </div>
+                        <div class="tree-prediction">Pred: 189</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 10px;">
+                    <strong>Final Prediction = Average of all 100 trees</strong><br>
+                    <span style="font-size: 1.2em; color: #00b894;">(187 + 195 + 178 + 192 + 183 + ... + 189) ÷ 100 = <strong>${examples[currentExample].rfPred} days</strong></span>
+                </div>
+            `;
+            
+            forestContainer.innerHTML = forestHTML;
         }
-    }
-
-    document.getElementById('result').innerHTML = `Your score: ${score} out of 6<br>${resultText}`;
-}
-
-
-        window.onload = function () {
-            nextVerb(); 
+        
+        function generateLightGBMVisual() {
+            const sequenceContainer = document.getElementById('lgb-sequence-visual');
+            
+            const basePred = examples[currentExample].lgbPred;
+            
+            const sequenceHTML = `
+                <div style="text-align: center; margin-bottom: 20px; font-size: 1.1em;">
+                    <strong>Sequential Boosting Process</strong><br>
+                    <em>Each tree learns from previous mistakes</em>
+                </div>
+                <div class="boosting-sequence">
+                    <div class="boost-step" data-step="Initial">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+                            Start with simple prediction (mean of training data)
+                        </div>
+                        <div class="boost-content">
+                            <div></div>
+                            <div class="boost-result">Prediction: 220 days</div>
+                            <div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="boost-step" data-step="Tree 1">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+                            Learn to predict residuals (actual - current prediction)
+                        </div>
+                        <div class="boost-content">
+                            <div class="boost-tree">
+Tasks > 40?
+├─ Residual: -25
+└─ Residual: -35
+                            </div>
+                            <div class="boost-arrow">→</div>
+                            <div class="boost-result">220 + (-30) = 190 days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="boost-step" data-step="Tree 2">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+                            Fix remaining errors from Tree 1
+                        </div>
+                        <div class="boost-content">
+                            <div class="boost-tree">
+Velocity > 0.3?
+├─ Residual: +8
+└─ Residual: -12
+                            </div>
+                            <div class="boost-arrow">→</div>
+                            <div class="boost-result">190 + (-5) = 185 days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="boost-step" data-step="Tree 3">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+                            Continue refining predictions
+                        </div>
+                        <div class="boost-content">
+                            <div class="boost-tree">
+States > 6?
+├─ Residual: +15
+└─ Residual: +18
+                            </div>
+                            <div class="boost-arrow">→</div>
+                            <div class="boost-result">185 + (+16) = 201 days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="boost-step" data-step="... 2500">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+                            Continue for 2500 iterations with learning rate = 0.05
+                        </div>
+                        <div class="boost-content">
+                            <div class="boost-tree">
+Each tree makes
+smaller and smaller
+corrections...
+                            </div>
+                            <div class="boost-arrow">→</div>
+                            <div class="boost-result">Final: ${basePred} days</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #fff0f0; border-radius: 10px;">
+                    <strong>Final LightGBM Prediction = Initial + Tree₁×0.05 + Tree₂×0.05 + ... + Tree₂₅₀₀×0.05</strong><br>
+                    <span style="font-size: 1.2em; color: #ff6b6b;"><strong>${basePred} days</strong></span>
+                </div>
+            `;
+            
+            sequenceContainer.innerHTML = sequenceHTML;
         }
+        
+        function generateFeatureImportance() {
+            const rfFeatures = [
+                { name: 'Task Velocity', importance: 0.28 },
+                { name: 'State Entropy', importance: 0.22 },
+                { name: 'Total Tasks', importance: 0.18 },
+                { name: 'Division', importance: 0.15 },
+                { name: 'Age (days)', importance: 0.17 }
+            ];
+            
+            const lgbFeatures = [
+                { name: 'State Entropy', importance: 0.31 },
+                { name: 'Task Velocity', importance: 0.25 },
+                { name: 'Early Transitions', importance: 0.19 },
+                { name: 'Division', importance: 0.13 },
+                { name: 'Total Tasks', importance: 0.12 }
+            ];
+            
+            function createImportanceHTML(features) {
+                return features.map(feature => `
+                    <div class="importance-bar">
+                        <div class="importance-label">${feature.name}</div>
+                        <div class="importance-visual">
+                            <div class="importance-fill" style="width: ${feature.importance * 100}%"></div>
+                        </div>
+                        <div class="importance-value">${(feature.importance * 100).toFixed(0)}%</div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('rf-importance').innerHTML = createImportanceHTML(rfFeatures);
+            document.getElementById('lgb-importance').innerHTML = createImportanceHTML(lgbFeatures);
+        }
+        
+        function runAnimation() {
+            if (animationRunning) return;
+            animationRunning = true;
+            
+            const animationDiv = document.getElementById('boosting-animation');
+            animationDiv.classList.add('active');
+            
+            const steps = document.getElementById('boosting-steps');
+            steps.innerHTML = `
+                <div class="weak-learner" id="learner-1">Initial: 200 days</div>
+                <div class="weak-learner" id="learner-2">+ Tree 1: -15</div>
+                <div class="weak-learner" id="learner-3">+ Tree 2: -8</div>
+                <div class="weak-learner" id="learner-4">+ Tree 3: +5</div>
+                <div class="weak-learner" id="learner-5">+ Tree 4: -3</div>
+            `;
+            
+            // Animate learners improving
+            setTimeout(() => {
+                document.getElementById('learner-1').classList.add('improving');
+            }, 500);
+            
+            setTimeout(() => {
+                document.getElementById('learner-2').classList.add('improving');
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('learner-3').classList.add('improving');
+            }, 1500);
+            
+            setTimeout(() => {
+                document.getElementById('learner-4').classList.add('improving');
+            }, 2000);
+            
+            setTimeout(() => {
+                document.getElementById('learner-5').classList.add('improving');
+                animationRunning = false;
+                
+                // Hide animation after a delay
+                setTimeout(() => {
+                    animationDiv.classList.remove('active');
+                    // Reset learners
+                    document.querySelectorAll('.weak-learner').forEach(learner => {
+                        learner.classList.remove('improving');
+                    });
+                }, 2000);
+            }, 2500);
+        }
+        
+        // Initialize
+        showExample('simple');
     </script>
 </body>
 </html>
